@@ -12,7 +12,6 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Teacher, Lesson, LessonContent, TeacherLessonAssignment, LoginHistory, PartnerSchool, Review
 from .seed import seed_database
 
-# ------------------------------------------
 # HELPER: Ensure Database is Seeded on First Request
 # ------------------------------------------
 def _ensure_seeded():
