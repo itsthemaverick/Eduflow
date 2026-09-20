@@ -15,8 +15,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
 
     # --------------------------------------
-    # 2. EDUCATOR DASHBOARD & LESSON VIEWER
-    # --------------------------------------
     path('dashboard/', views.teacher_dashboard_view, name='my_dashboard'),
     path('teacher/<int:teacher_id>/', views.teacher_dashboard_view, name='teacher_dashboard'),
     path('teacher/<int:teacher_id>/profile/', views.teacher_profile_view, name='teacher_profile'),
