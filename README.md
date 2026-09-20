@@ -26,7 +26,7 @@ Provided you have **Python 3.8+** installed on your system:
 ## 🔑 Administrator Credentials
 
 - **Username:** `Maverick`
-- **Password:** `Yashraj@7777`
+- **Password:** `Yashraj`
 - **Role:** Platform Administrator (`Yashraj Bhogade`)
 
 ---
