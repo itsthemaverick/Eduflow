@@ -1,8 +1,3 @@
-# ==========================================
-# PROJECT JHEP NGO PORTAL - DATABASE SEEDER
-# ==========================================
-# Populates initial demo data for Teachers, Lessons, and Content Items
-# so the platform is ready for demonstration upon container boot.
 
 from portal.models import Teacher, Lesson, LessonContent, TeacherLessonAssignment, LoginHistory, PartnerSchool, Review
 from django.utils import timezone
