@@ -1,0 +1,442 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <!-- ================================================================= -->
+  <!-- 1. META TAGS & PAGE HEAD                                          -->
+  <!-- ================================================================= -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Project Jhep | NGO Rural Teacher Training Portal{% endblock %}</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3.3 CSS (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Custom CSS Design System & Micro-Animations -->
+  <style>
+    :root {
+      --brand-primary: #f97316;
+      --brand-secondary: #ea580c;
+      --brand-accent: #d97706;
+      --brand-glow: rgba(249, 115, 22, 0.25);
+    }
+
+    /* Custom Modern Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    html[data-bs-theme="dark"] ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(249, 115, 22, 0.4);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(249, 115, 22, 0.7);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bs-body-bg);
+      color: var(--bs-body-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6, .font-heading {
+      font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Gradient Typography & Accents */
+    .brand-gradient {
+      background: linear-gradient(135deg, #f97316 0%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .bg-brand-gradient {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #ffffff;
+    }
+    .bg-brand-gradient:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+      color: #ffffff;
+    }
+
+    /* Glassmorphism Navigation & Cards */
+    .glass-nav {
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background-color: rgba(255, 255, 255, 0.85) !important;
+      transition: all 0.3s ease;
+    }
+    html[data-bs-theme="dark"] .glass-nav {
+      background-color: rgba(15, 23, 42, 0.85) !important;
+      border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    html[data-bs-theme="dark"] .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Hover Lift & Glow Animations */
+    .card-hover-lift {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .card-hover-lift:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -10px var(--brand-glow), 0 10px 15px -5px rgba(0,0,0,0.04) !important;
+    }
+
+    .btn-glow {
+      transition: all 0.3s ease;
+    }
+    .btn-glow:hover {
+      box-shadow: 0 8px 25px var(--brand-glow);
+      transform: translateY(-2px);
+    }
+
+    /* Dynamic CSS Keyframe Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(249, 115, 22, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
+      }
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-scale-in {
+      animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-float {
+      animation: floatSlow 4s ease-in-out infinite;
+    }
+
+    /* Ambient Background Mesh */
+    .bg-mesh-pattern {
+      background-image: radial-gradient(rgba(249, 115, 22, 0.12) 1px, transparent 1px), radial-gradient(rgba(234, 88, 12, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+
+    /* Progress bar styling */
+    .progress-bar-brand {
+      background: linear-gradient(90deg, #f97316 0%, #f59e0b 100%);
+      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Back to Top Floating Button */
+    #backToTopBtn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    #backToTopBtn.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .nav-link.active {
+      position: relative;
+    }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0.5rem;
+      right: 0.5rem;
+      height: 3px;
+      background: linear-gradient(90deg, #f97316, #f59e0b);
+      border-radius: 3px;
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-body-tertiary">
+
+  <!-- ================================================================= -->
+  <!-- 2. TOP NAVBAR HEADER                                             -->
+  <!-- ================================================================= -->
+  <nav class="navbar navbar-expand-lg sticky-top border-bottom shadow-sm glass-nav">
+    <div class="container py-1">
+      
+      <!-- Brand Logo & NGO Title -->
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-extrabold" href="{% url 'landing' %}">
+        <div class="bg-brand-gradient p-2 rounded-3 d-inline-flex align-items-center justify-content-center shadow-sm animate-float" style="width: 40px; height: 40px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-white" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 3.5C22 3.5 17.5 5.5 14 4.5C10.5 3.5 8 1.5 4 3C1 4.2 0 8.5 0 8.5C0 8.5 3.5 7.5 5.5 8.5C7.5 9.5 8.5 12 7.5 15C6.5 18 3.5 20.5 3.5 20.5C3.5 20.5 7.5 20 11.5 17C15.5 14 17.5 9.5 22 3.5Z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="fw-bold fs-5 text-body font-heading">Project <span class="brand-gradient">Jhep</span></span>
+          <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1 text-uppercase rounded-pill" style="font-size: 0.65rem; padding: 0.25em 0.6em;">NGO Portal</span>
+        </div>
+      </a>
+
+      <!-- Mobile Toggle Button -->
+      <button class="navbar-toggler border-0 shadow-none p-2 rounded-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list fs-2 text-body"></i>
+      </button>
+
+      <!-- Navigation Links & User Menu -->
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 fw-semibold fs-7 gap-lg-1">
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded-3 {% if page == 'landing' %}active text-warning fw-bold{% endif %}" href="{% url 'landing' %}">
+              <i class="bi bi-house-door me-1"></i> Public Portal
+            </a>
+          </li>
+          
+          {% if user and user.role == 'Teacher' %}
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded-3 {% if page == 'teacher_dashboard' %}active text-warning fw-bold{% endif %}" href="{% url 'my_dashboard' %}">
+              <i class="bi bi-journal-check me-1"></i> My Dashboard
+            </a>
+          </li>
+          {% endif %}
+
+          {% if user and user.role == 'Admin' %}
+          <li class="nav-item">
+            <a class="nav-link py-2 px-3 rounded-3 {% if page == 'admin_panel' %}active text-warning fw-bold{% endif %}" href="{% url 'admin_dashboard' %}">
+              <i class="bi bi-shield-lock me-1"></i> Admin Control Panel
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+
+        <!-- Right Side: Dark Mode & User Actions -->
+        <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+          
+          <!-- Theme Mode Switcher -->
+          <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-2 shadow-sm transition-all" id="themeToggleBtn" title="Toggle Light / Dark Mode" style="width: 40px; height: 40px;">
+            <i class="bi bi-moon-stars fs-6" id="themeIcon"></i>
+          </button>
+
+          {% if user %}
+            <!-- Authenticated User Profile Pill -->
+            <div class="dropdown">
+              <button class="btn btn-light border rounded-pill d-flex align-items-center gap-2 p-1 pe-3 shadow-sm dropdown-toggle transition-all" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="rounded-circle bg-warning-subtle text-warning-emphasis d-flex align-items-center justify-content-center flex-shrink-0 fw-bold border border-warning-subtle" style="width: 32px; height: 32px;">
+                  <i class="bi bi-person-fill fs-6 text-warning"></i>
+                </div>
+                <span class="fw-bold fs-7 text-truncate" style="max-width: 140px;">{{ user.name }}</span>
+                <span class="badge {% if user.role == 'Admin' %}bg-primary{% else %}bg-warning-subtle text-warning-emphasis border border-warning-subtle{% endif %} rounded-pill fs-8">{{ user.role }}</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 p-2 animate-scale-in">
+                <li class="px-3 py-2 border-bottom mb-1">
+                  <div class="fw-bold text-body fs-7">{{ user.name }}</div>
+                  <div class="text-muted small">@{{ user.username }} • {{ user.school_region }}</div>
+                </li>
+                {% if user.id %}
+                <li>
+                  <a class="dropdown-item py-2 px-3 rounded-3 fs-7" href="{% url 'teacher_profile' teacher_id=user.id %}">
+                    <i class="bi bi-person-badge me-2 text-warning"></i> View Profile & Logs
+                  </a>
+                </li>
+                {% endif %}
+                <li>
+                  <a class="dropdown-item py-2 px-3 rounded-3 fs-7 text-danger fw-semibold" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Direct Quick Logout Button -->
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold d-flex align-items-center gap-1 shadow-sm" title="Safely Logout">
+              <i class="bi bi-box-arrow-right"></i>
+              <span class="d-none d-sm-inline">Log Out</span>
+            </a>
+          {% else %}
+            <!-- Public User Login Button -->
+            <a href="{% url 'login' %}" class="btn btn-warning bg-brand-gradient border-0 text-white font-bold rounded-pill px-4 shadow-sm fw-bold btn-glow">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Portal Login
+            </a>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================================================================= -->
+  <!-- 3. DJANGO ALERT MESSAGES BANNER                                  -->
+  <!-- ================================================================= -->
+  <div class="container mt-3">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center gap-3 animate-fade-in-up" role="alert">
+          <div class="p-2 rounded-circle {% if message.tags == 'success' %}bg-success-subtle text-success{% elif message.tags == 'error' %}bg-danger-subtle text-danger{% else %}bg-info-subtle text-info{% endif %} d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% elif message.tags == 'error' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %} fs-5"></i>
+          </div>
+          <div class="fw-medium">{{ message }}</div>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- 4. MAIN DYNAMIC PAGE CONTENT BLOCK                                -->
+  <!-- ================================================================= -->
+  <main class="flex-grow-1">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Floating Back To Top Button -->
+  <button id="backToTopBtn" class="btn btn-warning bg-brand-gradient border-0 text-white rounded-circle shadow-lg d-flex align-items-center justify-content-center p-0 btn-glow" style="width: 46px; height: 46px;" title="Back to Top">
+    <i class="bi bi-arrow-up-short fs-3"></i>
+  </button>
+
+  <!-- ================================================================= -->
+  <!-- 5. SPROUG HUB FOUNDATION FOOTER SECTION                          -->
+  <!-- ================================================================= -->
+  <footer class="bg-body border-top py-5 mt-5 position-relative">
+    <div class="container">
+      <div class="row gy-4 align-items-center">
+        <!-- Logo & Organization Info -->
+        <div class="col-md-7 text-center text-md-start">
+          <div class="d-flex flex-column flex-sm-row align-items-center align-items-md-start gap-3 mb-2">
+            <!-- Sproug Hub Foundation Official Logo -->
+            <div class="bg-white p-2 rounded-3 border shadow-sm d-inline-flex align-items-center justify-content-center transition-all hover:scale-105" style="max-width: 170px;">
+              <img src="{% static 'images/sproug_hub_logo.jpg' %}" alt="Sproug Hub Foundation Logo" class="img-fluid rounded-2" style="max-height: 52px; object-fit: contain;">
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 justify-content-center justify-content-md-start mb-1">
+                <span class="fw-extrabold fs-6 text-body font-heading">Sproug Hub Foundation</span>
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill fs-8">Platform Foundation</span>
+              </div>
+              <p class="text-muted small mb-0 max-w-xl">
+                This application is proudly created, powered, and maintained by <strong>Sproug Hub Foundation</strong> — dedicated to transforming rural education through offline-first digital learning solutions, video masterclasses, and educator empowerment across community schools.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Copyright & Platform Info -->
+        <div class="col-md-5 text-center text-md-end text-muted small">
+          <div class="mb-2">
+            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold">
+              <i class="bi bi-shield-check me-1"></i> Production Ready Deployment
+            </span>
+          </div>
+          <p class="fw-semibold text-body mb-1">&copy; {% now "Y" %} Sproug Hub Foundation & Project Jhep. All rights reserved.</p>
+          <p class="text-secondary mb-0" style="font-size: 0.775rem;">Developed for Rural School Educators & Regional Curriculum Coordinators.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================================================================= -->
+  <!-- 6. BOOTSTRAP 5.3 BUNDLE JS & THEME TOGGLE SCRIPT                  -->
+  <!-- ================================================================= -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Dark / Light Theme Mode Script
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    const htmlEl = document.documentElement;
+
+    // Load stored theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+
+    function setTheme(theme) {
+      htmlEl.setAttribute('data-bs-theme', theme);
+      localStorage.setItem('theme', theme);
+      if (theme === 'dark') {
+        themeIcon.className = 'bi bi-sun-fill text-warning';
+      } else {
+        themeIcon.className = 'bi bi-moon-stars text-body';
+      }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = htmlEl.getAttribute('data-bs-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // Back to Top Smooth Scroll Listener
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTopBtn.classList.add('show');
+      } else {
+        backToTopBtn.classList.remove('show');
+      }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
+

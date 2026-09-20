@@ -1,0 +1,1381 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Control Panel | Project Jhep NGO Network{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- ================================================================= -->
+  <!-- 1. ADMIN HEADER & SYSTEM METRICS                                  -->
+  <!-- ================================================================= -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-bold text-uppercase mb-1">
+        Curriculum Operations
+      </span>
+      <h2 class="fw-extrabold text-body mb-0">NGO Portal Administrator Center</h2>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-outline-primary rounded-pill fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+        <i class="bi bi-shield-plus me-1"></i> Register Admin
+      </button>
+
+      <button class="btn btn-warning bg-brand-gradient text-white rounded-pill fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+        <i class="bi bi-person-plus-fill me-1"></i> Register Educator
+      </button>
+
+      <button class="btn btn-primary rounded-pill fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createLessonModal">
+        <i class="bi bi-plus-circle-fill me-1"></i> Create Lesson
+      </button>
+
+      <button class="btn btn-outline-success rounded-pill fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addPartnerSchoolModal">
+        <i class="bi bi-building-add me-1"></i> Add Partner School
+      </button>
+
+      <button class="btn btn-outline-warning text-dark rounded-pill fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+        <i class="bi bi-star-fill me-1"></i> Add Review
+      </button>
+
+      <a href="{% url 'logout' %}" class="btn btn-outline-danger rounded-pill fw-bold shadow-sm" title="Logout from Admin Session">
+        <i class="bi bi-box-arrow-right me-1"></i> Log Out
+      </a>
+    </div>
+  </div>
+
+  <!-- Stat Summary Cards -->
+  <div class="row g-3 mb-4 animate-fade-in-up">
+    <div class="col-6 col-md-3">
+      <div class="p-3 bg-body rounded-4 border shadow-sm card-hover-lift d-flex align-items-center gap-3">
+        <div class="p-3 bg-warning-subtle text-warning rounded-4 fs-4 border border-warning-subtle">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div>
+          <span class="text-muted small fw-semibold text-uppercase">Educators Enrolled</span>
+          <h3 class="fw-extrabold text-body mb-0 mt-1 font-heading">{{ stats.total_teachers }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 bg-body rounded-4 border shadow-sm card-hover-lift d-flex align-items-center gap-3">
+        <div class="p-3 bg-primary-subtle text-primary rounded-4 fs-4 border border-primary-subtle">
+          <i class="bi bi-journal-bookmark-fill"></i>
+        </div>
+        <div>
+          <span class="text-muted small fw-semibold text-uppercase">Catalog Modules</span>
+          <h3 class="fw-extrabold text-body mb-0 mt-1 font-heading">{{ stats.total_lessons }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 bg-body rounded-4 border shadow-sm card-hover-lift d-flex align-items-center gap-3">
+        <div class="p-3 bg-info-subtle text-info rounded-4 fs-4 border border-info-subtle">
+          <i class="bi bi-play-circle-fill"></i>
+        </div>
+        <div>
+          <span class="text-muted small fw-semibold text-uppercase">Media Resources</span>
+          <h3 class="fw-extrabold text-body mb-0 mt-1 font-heading">{{ stats.total_content_files }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="p-3 bg-body rounded-4 border shadow-sm card-hover-lift d-flex align-items-center gap-3">
+        <div class="p-3 bg-success-subtle text-success rounded-4 fs-4 border border-success-subtle">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div>
+          <span class="text-muted small fw-semibold text-uppercase">Completed Modules</span>
+          <h3 class="fw-extrabold text-success mb-0 mt-1 font-heading">{{ stats.completed_assignments }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- 2. TABBED MANAGEMENT SECTIONS                                     -->
+  <!-- ================================================================= -->
+  <div class="card border rounded-4 shadow-sm bg-body overflow-hidden animate-scale-in">
+    
+    <div class="card-header bg-body-tertiary border-bottom p-2">
+      <ul class="nav nav-pills nav-fill gap-1" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active rounded-3 fw-bold fs-7 py-2" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#teachers-pane" type="button" role="tab">
+            <i class="bi bi-people-fill me-2"></i> Educator Profiles ({{ teachers|length }})
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link rounded-3 fw-bold fs-7 py-2" id="lessons-tab" data-bs-toggle="tab" data-bs-target="#lessons-pane" type="button" role="tab">
+            <i class="bi bi-book-half me-2"></i> Lesson Catalog ({{ lessons|length }})
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link rounded-3 fw-bold fs-7 py-2" id="admins-tab" data-bs-toggle="tab" data-bs-target="#admins-pane" type="button" role="tab">
+            <i class="bi bi-shield-lock-fill me-2"></i> Admins ({{ admins|length }})
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link rounded-3 fw-bold fs-7 py-2" id="schools-tab" data-bs-toggle="tab" data-bs-target="#schools-pane" type="button" role="tab">
+            <i class="bi bi-building me-2"></i> Partner Schools ({{ partner_schools|length }})
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link rounded-3 fw-bold fs-7 py-2" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-pane" type="button" role="tab">
+            <i class="bi bi-chat-quote-fill me-2"></i> Reviews ({{ reviews|length }})
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link rounded-3 fw-bold fs-7 py-2" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs-pane" type="button" role="tab">
+            <i class="bi bi-shield-check me-2"></i> Security Audit Logs
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="tab-content" id="adminTabsContent">
+        
+        <!-- ----------------------------------------------------------- -->
+        <!-- TAB 1: TEACHER MANAGEMENT TABLE                              -->
+        <!-- ----------------------------------------------------------- -->
+        <div class="tab-pane fade show active p-3" id="teachers-pane" role="tabpanel">
+          
+          <!-- Quick Search Filter for Educators -->
+          <div class="mb-3">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-body-tertiary border-end-0 rounded-start-pill ps-3">
+                <i class="bi bi-search text-muted"></i>
+              </span>
+              <input type="text" id="teacherSearchInput" class="form-control border-start-0 rounded-end-pill py-2" placeholder="Search educators by name, username, region, or specialty..." onkeyup="filterTeachers()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="teachersTable">
+              <thead class="table-light">
+                <tr class="text-uppercase fs-8 text-muted">
+                  <th>Educator</th>
+                  <th>School Region</th>
+                  <th>Specialty</th>
+                  <th>Password</th>
+                  <th>Assigned Lessons</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for t in teachers %}
+                <tr class="teacher-row">
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="rounded-circle bg-secondary-subtle text-secondary-emphasis d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 40px; height: 40px;">
+                        <i class="bi bi-person-fill fs-5"></i>
+                      </div>
+                      <div>
+                        <div class="fw-bold text-body search-target-name">{{ t.name }}</div>
+                        <div class="text-muted small search-target-meta">@{{ t.username }} • {{ t.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill search-target-region">{{ t.school_region }}</span></td>
+                  <td><span class="fw-semibold small text-body search-target-specialty">{{ t.subject_specialty }}</span></td>
+                  <td>
+                    <div class="d-flex align-items-center gap-1">
+                      <input type="password" id="tblPass{{ t.id }}" class="form-control form-control-sm font-monospace border-0 bg-body-tertiary px-2 py-1 text-center" style="width: 105px; font-size: 0.85rem;" value="{{ t.password }}" readonly>
+                      <button type="button" class="btn btn-sm btn-link text-muted p-0 ms-1" onclick="toggleTablePassword('tblPass{{ t.id }}', this)" title="Show/Hide Password">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3">
+                      {{ t.assignments.count }} Lessons
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <div class="d-flex justify-content-end align-items-center gap-2">
+                      <!-- View Teacher Profile & Security Logs -->
+                      <a href="{% url 'teacher_profile' teacher_id=t.id %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold" title="View Profile and Audit Logs">
+                        <i class="bi bi-person-badge me-1"></i> Profile
+                      </a>
+
+                      <!-- Assign Lessons Modal Trigger -->
+                      <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#assignModal{{ t.id }}" title="Assign Lessons">
+                        <i class="bi bi-gear-fill me-1"></i> Assign
+                      </button>
+
+                      <!-- View & Set Password Modal Trigger -->
+                      <button class="btn btn-outline-dark btn-sm rounded-circle p-1 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#passwordModal{{ t.id }}" style="width: 32px; height: 32px;" title="View & Set Password">
+                        <i class="bi bi-key-fill text-warning"></i>
+                      </button>
+
+                      <!-- Edit Educator Details Trigger -->
+                      <button class="btn btn-outline-warning btn-sm rounded-circle p-1 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#editTeacherModal{{ t.id }}" style="width: 32px; height: 32px;" title="Edit Educator Profile">
+                        <i class="bi bi-pencil-fill"></i>
+                      </button>
+
+                      <!-- Delete Educator Profile Trigger -->
+                      <button class="btn btn-outline-danger btn-sm rounded-circle p-1 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#deleteTeacherModal{{ t.id }}" style="width: 32px; height: 32px;" title="Delete Profile">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-4 text-muted">No educator profiles registered yet.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Educator Modals Container (Valid HTML Placement) -->
+          {% for t in teachers %}
+          <!-- 1. Assign Lessons Modal for Teacher -->
+          <div class="modal fade" id="assignModal{{ t.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-brand-gradient text-white">
+                  <h5 class="modal-title fw-bold">Assign Curriculum Modules: {{ t.name }}</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'admin_assign_lessons' teacher_id=t.id %}">
+                  {% csrf_token %}
+                  <div class="modal-body p-4">
+                    <p class="small text-muted mb-3">Select the curriculum modules to assign to {{ t.name }}:</p>
+                    <div class="d-flex flex-column gap-2" style="max-height: 260px; overflow-y: auto;">
+                      {% for l in lessons %}
+                        <div class="form-check p-2 bg-body-tertiary rounded-3 border">
+                          <input class="form-check-input ms-1" type="checkbox" name="lessons" value="{{ l.id }}" id="chk{{ t.id }}_{{ l.id }}" {% if l.id in t.assigned_lesson_ids %}checked{% endif %}>
+                          <label class="form-check-label fw-bold ms-2 text-body" for="chk{{ t.id }}_{{ l.id }}">
+                            {{ l.title }} <span class="badge bg-secondary-subtle text-secondary fs-8">{{ l.subject }}</span>
+                          </label>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="modal-footer bg-body-tertiary">
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning bg-brand-gradient text-white btn-sm rounded-pill fw-bold px-4">Save Assignments</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Edit Teacher Details Modal -->
+          <div class="modal fade" id="editTeacherModal{{ t.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-warning text-dark">
+                  <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i> Edit Educator Profile: {{ t.name }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'admin_edit_teacher' teacher_id=t.id %}">
+                  {% csrf_token %}
+                  <div class="modal-body p-4">
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Full Name</label>
+                      <input type="text" name="name" class="form-control rounded-3" value="{{ t.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Official Email</label>
+                      <input type="email" name="email" class="form-control rounded-3" value="{{ t.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Login Password</label>
+                      <div class="input-group">
+                        <input type="password" id="editPassInput{{ t.id }}" name="password" class="form-control font-monospace" value="{{ t.password }}" required>
+                        <button class="btn btn-outline-secondary" type="button" onclick="toggleTablePassword('editPassInput{{ t.id }}', this)" title="Show/Hide Password">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                      </div>
+                      <div class="form-text fs-8">Admin can view or modify the login password here.</div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">School District / Region</label>
+                      <input type="text" name="school_region" class="form-control rounded-3" value="{{ t.school_region }}">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Subject Specialty</label>
+                      <input type="text" name="subject_specialty" class="form-control rounded-3" value="{{ t.subject_specialty }}">
+                    </div>
+                  </div>
+                  <div class="modal-footer bg-body-tertiary">
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning rounded-pill fw-bold px-4">Update Profile & Password</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2b. Dedicated View & Set Password Modal -->
+          <div class="modal fade" id="passwordModal{{ t.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white">
+                  <h5 class="modal-title fw-bold"><i class="bi bi-key-fill text-warning me-2"></i> Manage Educator Password: {{ t.name }}</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'admin_set_teacher_password' teacher_id=t.id %}">
+                  {% csrf_token %}
+                  <div class="modal-body p-4">
+                    <div class="mb-4 p-3 bg-body-tertiary rounded-3 border">
+                      <label class="form-label fw-bold small text-muted d-block mb-1">Current Password for @{{ t.username }}</label>
+                      <div class="input-group">
+                        <input type="password" id="modalCurrPass{{ t.id }}" class="form-control font-monospace bg-white fw-bold" value="{{ t.password }}" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="toggleTablePassword('modalCurrPass{{ t.id }}', this)" title="Show/Hide Password">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-primary" type="button" onclick="copyPassword('modalCurrPass{{ t.id }}')" title="Copy Password">
+                          <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Set New Password</label>
+                      <div class="input-group">
+                        <input type="text" id="newPassInput{{ t.id }}" name="password" class="form-control rounded-start-3 font-monospace" placeholder="Enter new password..." required>
+                        <button class="btn btn-outline-secondary" type="button" onclick="generateRandomPass('newPassInput{{ t.id }}')">
+                          <i class="bi bi-shuffle me-1"></i> Generate
+                        </button>
+                      </div>
+                      <div class="form-text fs-8">Assigning a new password takes effect immediately for teacher login.</div>
+                    </div>
+                  </div>
+                  <div class="modal-footer bg-body-tertiary">
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning bg-brand-gradient text-white btn-sm rounded-pill fw-bold px-4"><i class="bi bi-check-circle-fill me-1"></i> Update Password</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Delete Educator Confirmation Modal -->
+          <div class="modal fade" id="deleteTeacherModal{{ t.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                  <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> Delete Educator Profile</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                  <div class="display-6 text-danger mb-3"><i class="bi bi-trash3-fill"></i></div>
+                  <h6 class="fw-bold mb-2">Are you sure you want to delete {{ t.name }}?</h6>
+                  <p class="text-muted small mb-0">This will permanently remove their profile (@{{ t.username }}), region assignments, and system records. This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer bg-body-tertiary">
+                  <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                  <form method="POST" action="{% url 'admin_delete_teacher' teacher_id=t.id %}" class="d-inline m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm rounded-pill fw-bold px-4">Yes, Delete Profile</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+
+        <!-- ----------------------------------------------------------- -->
+        <!-- TAB 2: LESSON CATALOG TABLE                                  -->
+        <!-- ----------------------------------------------------------- -->
+        <div class="tab-pane fade p-3" id="lessons-pane" role="tabpanel">
+          
+          <!-- Quick Search Filter for Lessons -->
+          <div class="mb-3">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-body-tertiary border-end-0 rounded-start-pill ps-3">
+                <i class="bi bi-search text-muted"></i>
+              </span>
+              <input type="text" id="lessonSearchInput" class="form-control border-start-0 rounded-end-pill py-2" placeholder="Search catalog modules by title, subject, grade, or summary..." onkeyup="filterLessons()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="lessonsTable">
+              <thead class="table-light">
+                <tr class="text-uppercase fs-8 text-muted">
+                  <th>Module Title</th>
+                  <th>Subject</th>
+                  <th>Grade</th>
+                  <th>Duration</th>
+                  <th>Media Files</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for l in lessons %}
+                <tr class="lesson-row">
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <img src="{{ l.thumbnail }}" alt="{{ l.title }}" class="rounded-3 object-fit-cover" width="50" height="38">
+                      <div>
+                        <div class="fw-bold text-body search-target-title">{{ l.title }}</div>
+                        <div class="text-muted small truncate max-w-xs search-target-summary">{{ l.summary|truncatechars:60 }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill search-target-subject">{{ l.subject }}</span></td>
+                  <td><span class="badge bg-dark rounded-pill search-target-grade">{{ l.grade }}</span></td>
+                  <td><span class="small text-muted">{{ l.duration }}</span></td>
+                  <td><span class="badge bg-secondary-subtle text-secondary rounded-pill">{{ l.contents.count }} Items</span></td>
+                  <td class="text-end">
+                    <div class="d-flex justify-content-end align-items-center gap-2">
+                      <!-- Preview Lesson Button -->
+                      <a href="{% url 'lesson_detail' lesson_id=l.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1" target="_blank" title="Preview Lesson View">
+                        <i class="bi bi-eye-fill"></i> Preview
+                      </a>
+
+                      <!-- Add Media Resource Modal Trigger -->
+                      <button class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addResourceModal{{ l.id }}" title="Add Attached Media Resource">
+                        <i class="bi bi-plus-circle-fill"></i> Add Media
+                      </button>
+
+                      <!-- Delete Lesson Trigger -->
+                      <button class="btn btn-outline-danger btn-sm rounded-circle p-1 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ l.id }}" style="width: 32px; height: 32px;" title="Delete Lesson">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-4 text-muted">No lessons in catalog.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Lesson Modals Container -->
+          {% for l in lessons %}
+          <!-- Modal: Add Media Resource for existing lesson -->
+          <div class="modal fade" id="addResourceModal{{ l.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-success text-white">
+                  <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle me-2"></i> Attach Media Resource: {{ l.title }}</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'admin_add_lesson_resource' lesson_id=l.id %}">
+                  {% csrf_token %}
+                  <div class="modal-body p-4">
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Resource Title</label>
+                      <input type="text" name="content_title" class="form-control rounded-3" placeholder="e.g. Supplementary Practice Worksheet" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Resource Type</label>
+                      <select name="content_type" class="form-select rounded-3">
+                        <option value="video">Video Lecture</option>
+                        <option value="pdf">PDF Document / Worksheet</option>
+                        <option value="quiz">Interactive Quiz</option>
+                        <option value="interactive">Presentation / App</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Media Stream / Asset URL</label>
+                      <input type="url" name="content_url" class="form-control rounded-3" placeholder="https://..." required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold small text-muted">Description</label>
+                      <input type="text" name="description" class="form-control rounded-3" placeholder="Instructions for classroom activity...">
+                    </div>
+                  </div>
+                  <div class="modal-footer bg-body-tertiary">
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-sm rounded-pill fw-bold px-4">Attach Resource</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal: Delete Lesson Confirmation -->
+          <div class="modal fade" id="deleteLessonModal{{ l.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                  <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> Delete Lesson Module</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                  <div class="display-6 text-danger mb-3"><i class="bi bi-journal-x"></i></div>
+                  <h6 class="fw-bold mb-2">Delete "{{ l.title }}" from Catalog?</h6>
+                  <p class="text-muted small mb-0">This lesson module ({{ l.subject }} • {{ l.grade }}) and its {{ l.contents.count }} attached media resource(s) will be permanently deleted. This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer bg-body-tertiary">
+                  <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                  <form method="POST" action="{% url 'admin_delete_lesson' lesson_id=l.id %}" class="d-inline m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm rounded-pill fw-bold px-4">Yes, Delete Lesson</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+
+        <!-- ----------------------------------------------------------- -->
+        <!-- TAB 3: AUDIT LOGIN LOGS TABLE                                -->
+        <!-- ----------------------------------------------------------- -->
+        <div class="tab-pane fade p-3" id="logs-pane" role="tabpanel">
+          
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div class="input-group input-group-sm max-w-md">
+              <span class="input-group-text bg-body-tertiary border-end-0 rounded-start-pill ps-3">
+                <i class="bi bi-search text-muted"></i>
+              </span>
+              <input type="text" id="logSearchInput" class="form-control border-start-0 rounded-end-pill py-2" placeholder="Search security logs by username, IP, or status..." onkeyup="filterLogs()">
+            </div>
+
+            <button class="btn btn-outline-secondary btn-sm rounded-pill fw-bold shadow-sm d-flex align-items-center gap-1" onclick="exportLogsToCSV()">
+              <i class="bi bi-download"></i> Export Audit Logs (CSV)
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle mb-0 font-monospace fs-7" id="logsTable">
+              <thead>
+                <tr class="text-uppercase text-muted fs-8">
+                  <th>Timestamp</th>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>IP Address</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in login_logs %}
+                <tr class="log-row">
+                  <td class="search-log-time">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                  <td class="fw-bold text-body search-log-user">{{ log.username }}</td>
+                  <td><span class="badge {% if log.user_role == 'Admin' %}bg-primary{% else %}bg-secondary{% endif %} rounded-pill fs-8">{{ log.user_role }}</span></td>
+                  <td class="search-log-ip">{{ log.ip_address }}</td>
+                  <td>
+                    <span class="badge {% if log.status == 'Success' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} rounded-pill fs-8 search-log-status">
+                      {{ log.status }}
+                    </span>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-3 text-muted">No audit logs recorded yet.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ----------------------------------------------------------- -->
+        <!-- TAB 4: ADMINISTRATORS MANAGEMENT                            -->
+        <!-- ----------------------------------------------------------- -->
+        <div class="tab-pane fade p-3" id="admins-pane" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-body mb-0"><i class="bi bi-shield-shaded me-2 text-primary"></i> System Administrator Accounts</h6>
+            <button class="btn btn-sm btn-primary rounded-pill fw-bold px-3" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+              <i class="bi bi-person-plus-fill me-1"></i> Add Another Admin
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr class="text-uppercase fs-8 text-muted">
+                  <th>Administrator</th>
+                  <th>Department / Region</th>
+                  <th>System Role</th>
+                  <th>Joined Date</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for a in admins %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 40px; height: 40px;">
+                        <i class="bi bi-shield-lock-fill fs-5"></i>
+                      </div>
+                      <div>
+                        <div class="fw-bold text-body">{{ a.name }}</div>
+                        <div class="text-muted small">@{{ a.username }} • {{ a.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill">{{ a.school_region }}</span></td>
+                  <td><span class="badge bg-primary text-white rounded-pill px-3"><i class="bi bi-shield-fill-check me-1"></i> {{ a.role }}</span></td>
+                  <td><span class="small text-muted">{{ a.joined_date }}</span></td>
+                  <td class="text-end">
+                    <div class="d-inline-flex gap-1">
+                      <a href="{% url 'teacher_profile' teacher_id=a.id %}" class="btn btn-outline-secondary btn-sm rounded-pill px-2 fw-bold" title="View Profile">
+                        <i class="bi bi-person-badge"></i>
+                      </a>
+                      <button class="btn btn-outline-primary btn-sm rounded-pill px-2 fw-bold" data-bs-toggle="modal" data-bs-target="#editAdminModal{{ a.id }}" title="Edit Admin">
+                        <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm rounded-pill px-2 fw-bold" data-bs-toggle="modal" data-bs-target="#deleteAdminModal{{ a.id }}" title="Delete Admin">
+                        <i class="bi bi-trash3"></i> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Edit Admin Modal -->
+                <div class="modal fade" id="editAdminModal{{ a.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                      <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i> Edit Administrator: {{ a.name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form method="POST" action="{% url 'admin_edit_admin' teacher_id=a.id %}">
+                        {% csrf_token %}
+                        <div class="modal-body p-4">
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Full Name</label>
+                            <input type="text" name="name" class="form-control rounded-3" value="{{ a.name }}" required>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Official Email</label>
+                            <input type="email" name="email" class="form-control rounded-3" value="{{ a.email }}" required>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">New Password (optional)</label>
+                            <input type="password" name="password" class="form-control rounded-3" placeholder="Leave blank to keep existing password">
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Department / Office</label>
+                            <input type="text" name="school_region" class="form-control rounded-3" value="{{ a.school_region }}">
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Role Title / Specialty</label>
+                            <input type="text" name="subject_specialty" class="form-control rounded-3" value="{{ a.subject_specialty }}">
+                          </div>
+                        </div>
+                        <div class="modal-footer bg-body-tertiary">
+                          <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn btn-primary rounded-pill fw-bold px-4">Save Changes</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Delete Admin Confirmation Modal -->
+                <div class="modal fade" id="deleteAdminModal{{ a.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                      <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> Delete Administrator Account</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body p-4 text-center">
+                        {% if user and user.id == a.id %}
+                          <div class="display-6 text-warning mb-3"><i class="bi bi-shield-lock-fill"></i></div>
+                          <h6 class="fw-bold mb-2">Current Active Account</h6>
+                          <p class="text-muted small mb-0">You are currently logged in as <strong>{{ a.name }}</strong>. You cannot delete your own account while logged in.</p>
+                        {% else %}
+                          <div class="display-6 text-danger mb-3"><i class="bi bi-trash3-fill"></i></div>
+                          <h6 class="fw-bold mb-2">Are you sure you want to delete {{ a.name }}?</h6>
+                          <p class="text-muted small mb-0">This will permanently remove administrator profile (@{{ a.username }}) and system access privileges. This action cannot be undone.</p>
+                        {% endif %}
+                      </div>
+                      <div class="modal-footer bg-body-tertiary">
+                        <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                        {% if not user or user.id != a.id %}
+                        <form method="POST" action="{% url 'admin_delete_admin' teacher_id=a.id %}" class="d-inline m-0">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger btn-sm rounded-pill fw-bold px-4">Yes, Delete Account</button>
+                        </form>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">No administrator accounts registered yet.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ----------------------------------------------------------- -->
+        <!-- TAB 5: PARTNER SCHOOLS MANAGEMENT                           -->
+        <!-- ----------------------------------------------------------- -->
+        <div class="tab-pane fade p-3" id="schools-pane" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-body mb-0"><i class="bi bi-building me-2 text-success"></i> Partner Schools & Institutional Network</h6>
+            <button class="btn btn-sm btn-success rounded-pill fw-bold px-3" data-bs-toggle="modal" data-bs-target="#addPartnerSchoolModal">
+              <i class="bi bi-plus-lg me-1"></i> Add Partner School
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr class="text-uppercase text-muted fs-8">
+                  <th>School & Location</th>
+                  <th>Impact</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for school in partner_schools %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <img src="{{ school.logo_url }}" alt="{{ school.name }}" class="rounded-3 border" style="width: 50px; height: 50px; object-fit: cover;">
+                      <div>
+                        <div class="fw-bold text-body">{{ school.name }}</div>
+                        <div class="small text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ school.location }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-warning-subtle text-warning-emphasis border rounded-pill px-3"><i class="bi bi-people-fill me-1"></i> {{ school.students_impacted }}</span></td>
+                  <td><span class="small text-muted text-truncate d-inline-block" style="max-width: 250px;">{{ school.description|default:"—" }}</span></td>
+                  <td>
+                    {% if school.is_active %}
+                    <span class="badge bg-success-subtle text-success rounded-pill px-3"><i class="bi bi-eye-fill me-1"></i> Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3"><i class="bi bi-eye-slash-fill me-1"></i> Hidden</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <div class="d-inline-flex gap-1">
+                      <button class="btn btn-outline-primary btn-sm rounded-pill px-2 fw-bold" data-bs-toggle="modal" data-bs-target="#editSchoolModal{{ school.id }}" title="Edit Partner School">
+                        <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm rounded-pill px-2 fw-bold" data-bs-toggle="modal" data-bs-target="#deleteSchoolModal{{ school.id }}" title="Delete Partner School">
+                        <i class="bi bi-trash3"></i> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Edit School Modal -->
+                <div class="modal fade" id="editSchoolModal{{ school.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                      <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i> Edit Partner School</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form method="POST" action="{% url 'admin_edit_partner_school' school_id=school.id %}">
+                        {% csrf_token %}
+                        <div class="modal-body p-4">
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">School / Hub Name</label>
+                            <input type="text" name="name" class="form-control rounded-3" value="{{ school.name }}" required>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Location / Region</label>
+                            <input type="text" name="location" class="form-control rounded-3" value="{{ school.location }}" required>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Logo / Cover Photo URL</label>
+                            <input type="url" name="logo_url" class="form-control rounded-3" value="{{ school.logo_url }}">
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Students Impacted Tag</label>
+                            <input type="text" name="students_impacted" class="form-control rounded-3" value="{{ school.students_impacted }}">
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Collaboration Summary</label>
+                            <textarea name="description" class="form-control rounded-3" rows="3">{{ school.description }}</textarea>
+                          </div>
+                          <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="schoolActive{{ school.id }}" {% if school.is_active %}checked{% endif %}>
+                            <label class="form-check-label fw-bold text-body" for="schoolActive{{ school.id }}">Display publicly on landing page</label>
+                          </div>
+                        </div>
+                        <div class="modal-footer bg-body-tertiary">
+                          <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn btn-success rounded-pill fw-bold px-4">Save Changes</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Delete School Modal -->
+                <div class="modal fade" id="deleteSchoolModal{{ school.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                      <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-trash3-fill me-2"></i> Delete Partner School</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body p-4 text-center">
+                        <div class="display-6 text-danger mb-3"><i class="bi bi-building-exclamation"></i></div>
+                        <h6 class="fw-bold mb-2">Delete {{ school.name }}?</h6>
+                        <p class="text-muted small mb-0">This will permanently remove this partner school entry from the platform display.</p>
+                      </div>
+                      <div class="modal-footer bg-body-tertiary">
+                        <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                        <form method="POST" action="{% url 'admin_delete_partner_school' school_id=school.id %}" class="d-inline m-0">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger btn-sm rounded-pill fw-bold px-4">Yes, Delete School</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">No partner schools registered yet.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ----------------------------------------------------------- -->
+        <!-- TAB 6: REVIEWS & TESTIMONIALS MANAGEMENT                    -->
+        <!-- ----------------------------------------------------------- -->
+        <div class="tab-pane fade p-3" id="reviews-pane" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-body mb-0"><i class="bi bi-chat-quote me-2 text-warning"></i> Educator Reviews & Testimonials Carousel</h6>
+            <button class="btn btn-sm btn-warning text-dark rounded-pill fw-bold px-3" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+              <i class="bi bi-plus-lg me-1"></i> Add Review
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr class="text-uppercase text-muted fs-8">
+                  <th>Educator / Author</th>
+                  <th>Rating</th>
+                  <th>Testimonial Quote</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for review in reviews %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <img src="{{ review.author_avatar }}" alt="{{ review.author_name }}" class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;">
+                      <div>
+                        <div class="fw-bold text-body">{{ review.author_name }}</div>
+                        <div class="small text-muted">{{ review.author_role }} {% if review.school_name %}&bull; {{ review.school_name }}{% endif %}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="text-warning small">
+                      {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                          <i class="bi bi-star-fill"></i>
+                        {% else %}
+                          <i class="bi bi-star text-muted"></i>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </td>
+                  <td><span class="small text-muted text-truncate d-inline-block fst-italic" style="max-width: 300px;">"{{ review.content }}"</span></td>
+                  <td>
+                    {% if review.is_active %}
+                    <span class="badge bg-success-subtle text-success rounded-pill px-3"><i class="bi bi-eye-fill me-1"></i> Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3"><i class="bi bi-eye-slash-fill me-1"></i> Hidden</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <div class="d-inline-flex gap-1">
+                      <button class="btn btn-outline-primary btn-sm rounded-pill px-2 fw-bold" data-bs-toggle="modal" data-bs-target="#editReviewModal{{ review.id }}" title="Edit Review">
+                        <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm rounded-pill px-2 fw-bold" data-bs-toggle="modal" data-bs-target="#deleteReviewModal{{ review.id }}" title="Delete Review">
+                        <i class="bi bi-trash3"></i> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Edit Review Modal -->
+                <div class="modal fade" id="editReviewModal{{ review.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                      <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i> Edit Educator Review</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form method="POST" action="{% url 'admin_edit_review' review_id=review.id %}">
+                        {% csrf_token %}
+                        <div class="modal-body p-4">
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Educator / Author Name</label>
+                            <input type="text" name="author_name" class="form-control rounded-3" value="{{ review.author_name }}" required>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Role Title / Designation</label>
+                            <input type="text" name="author_role" class="form-control rounded-3" value="{{ review.author_role }}" required>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">School / District Name</label>
+                            <input type="text" name="school_name" class="form-control rounded-3" value="{{ review.school_name }}">
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Avatar Image URL</label>
+                            <input type="url" name="author_avatar" class="form-control rounded-3" value="{{ review.author_avatar }}">
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Star Rating (1 to 5)</label>
+                            <select name="rating" class="form-select rounded-3">
+                              <option value="5" {% if review.rating == 5 %}selected{% endif %}>5 Stars (Excellent)</option>
+                              <option value="4" {% if review.rating == 4 %}selected{% endif %}>4 Stars (Very Good)</option>
+                              <option value="3" {% if review.rating == 3 %}selected{% endif %}>3 Stars (Good)</option>
+                              <option value="2" {% if review.rating == 2 %}selected{% endif %}>2 Stars (Fair)</option>
+                              <option value="1" {% if review.rating == 1 %}selected{% endif %}>1 Star (Needs Improvement)</option>
+                            </select>
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Testimonial Quote / Review Text</label>
+                            <textarea name="content" class="form-control rounded-3" rows="4" required>{{ review.content }}</textarea>
+                          </div>
+                          <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="reviewActive{{ review.id }}" {% if review.is_active %}checked{% endif %}>
+                            <label class="form-check-label fw-bold text-body" for="reviewActive{{ review.id }}">Display in landing carousel</label>
+                          </div>
+                        </div>
+                        <div class="modal-footer bg-body-tertiary">
+                          <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn btn-warning text-dark rounded-pill fw-bold px-4">Save Changes</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Delete Review Modal -->
+                <div class="modal fade" id="deleteReviewModal{{ review.id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                      <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-trash3-fill me-2"></i> Delete Review</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body p-4 text-center">
+                        <div class="display-6 text-danger mb-3"><i class="bi bi-chat-right-quote-fill"></i></div>
+                        <h6 class="fw-bold mb-2">Delete Review by {{ review.author_name }}?</h6>
+                        <p class="text-muted small mb-0">This will permanently remove this testimonial from the carousel.</p>
+                      </div>
+                      <div class="modal-footer bg-body-tertiary">
+                        <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                        <form method="POST" action="{% url 'admin_delete_review' review_id=review.id %}" class="d-inline m-0">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger btn-sm rounded-pill fw-bold px-4">Yes, Delete Review</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">No reviews recorded yet.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================================================================= -->
+<!-- MODAL: REGISTER NEW ADMINISTRATOR                                 -->
+<!-- ================================================================= -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-shield-plus me-2"></i> Register New Administrator</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'admin_add_admin' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Administrator Full Name</label>
+            <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Alex Rivera" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Portal Username</label>
+            <input type="text" name="username" class="form-control rounded-3" placeholder="e.g. alex.admin" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Official Email Address</label>
+            <input type="email" name="email" class="form-control rounded-3" placeholder="alex.rivera@jhep.org" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Login Password</label>
+            <input type="password" name="password" class="form-control rounded-3" placeholder="Leave blank for default: adminpassword">
+            <div class="form-text fs-8">Default password will be <code>adminpassword</code> if left blank.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Department / Administrative Office</label>
+            <input type="text" name="school_region" class="form-control rounded-3" placeholder="e.g. Central NGO HQ / Regional Operations">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Specialty / System Role Title</label>
+            <input type="text" name="subject_specialty" class="form-control rounded-3" placeholder="e.g. Curriculum Director / Operations Specialist">
+          </div>
+        </div>
+        <div class="modal-footer bg-body-tertiary">
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm rounded-pill fw-bold px-4"><i class="bi bi-shield-check me-1"></i> Register Admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- MODAL 1: REGISTER NEW TEACHER                                    -->
+<!-- ================================================================= -->
+<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-brand-gradient text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-person-plus-fill me-2"></i> Register Educator Profile</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'admin_add_teacher' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4 space-y-3">
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Full Name</label>
+            <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Priya Sharma" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Portal Username</label>
+            <input type="text" name="username" class="form-control rounded-3" placeholder="e.g. priya.sharma" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Official Email</label>
+            <input type="email" name="email" class="form-control rounded-3" placeholder="priya@ngoteach.org" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Set Login Password</label>
+            <div class="input-group">
+              <input type="text" id="addTeacherPassInput" name="password" class="form-control rounded-start-3 font-monospace" placeholder="e.g. teacher123">
+              <button class="btn btn-outline-secondary" type="button" onclick="generateRandomPass('addTeacherPassInput')">
+                <i class="bi bi-shuffle me-1"></i> Generate
+              </button>
+            </div>
+            <div class="form-text fs-8">Defaults to <code>teacher123</code> if left empty.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Assigned School District / Region</label>
+            <input type="text" name="school_region" class="form-control rounded-3" placeholder="e.g. Punjab Rural Primary Hub">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Subject Specialty</label>
+            <input type="text" name="subject_specialty" class="form-control rounded-3" placeholder="e.g. General Science">
+          </div>
+        </div>
+        <div class="modal-footer bg-body-tertiary">
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning bg-brand-gradient text-white btn-sm rounded-pill fw-bold px-4">Register Teacher</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- MODAL 2: CREATE NEW LESSON MODULE                                -->
+<!-- ================================================================= -->
+<div class="modal fade" id="createLessonModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-book-half me-2"></i> Create Curriculum Module</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'admin_create_lesson' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-muted">Lesson Title</label>
+              <input type="text" name="title" class="form-control rounded-3" placeholder="e.g. Solar Energy Basics" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-bold small text-muted">Academic Subject</label>
+              <input type="text" name="subject" class="form-control rounded-3" placeholder="Science" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-bold small text-muted">Target Grade</label>
+              <input type="text" name="grade" class="form-control rounded-3" placeholder="Grade 7" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-bold small text-muted">Estimated Duration</label>
+              <input type="text" name="duration" class="form-control rounded-3" placeholder="45 mins" value="45 mins">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label fw-bold small text-muted">Thumbnail Image Asset URL</label>
+              <input type="url" name="thumbnail" class="form-control rounded-3" placeholder="https://images.unsplash.com/...">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-bold small text-muted">Lesson Summary / Learning Objectives</label>
+              <textarea name="summary" class="form-control rounded-3" rows="2" placeholder="Summary of topics covered..."></textarea>
+            </div>
+
+            <div class="col-12 border-top pt-3">
+              <h6 class="fw-bold text-body mb-2"><i class="bi bi-paperclip me-1 text-primary"></i> Primary Media Resource Attachment</h6>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold small text-muted">Resource Title</label>
+              <input type="text" name="content_title" class="form-control rounded-3" placeholder="e.g. Video Lecture">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-bold small text-muted">Resource Type</label>
+              <select name="content_type" class="form-select rounded-3">
+                <option value="video">Video Lecture</option>
+                <option value="pdf">PDF Worksheet</option>
+                <option value="quiz">Interactive Quiz</option>
+                <option value="interactive">Presentation</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-bold small text-muted">Media Stream / Asset URL</label>
+              <input type="url" name="content_url" class="form-control rounded-3" placeholder="https://...">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-body-tertiary">
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm rounded-pill fw-bold px-4">Create Lesson Module</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- MODAL: REGISTER NEW PARTNER SCHOOL                                -->
+<!-- ================================================================= -->
+<div class="modal fade" id="addPartnerSchoolModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-building-add me-2"></i> Register New Partner School</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'admin_add_partner_school' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">School / Hub Name</label>
+            <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Zilla Parishad Primary School, Khed" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Location / District</label>
+            <input type="text" name="location" class="form-control rounded-3" placeholder="e.g. Pune District, Maharashtra" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Logo or Cover Photo URL</label>
+            <input type="url" name="logo_url" class="form-control rounded-3" placeholder="https://images.unsplash.com/...">
+            <div class="form-text fs-8">Provide image URL for the school avatar/logo. Defaults to stock photo if empty.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Students Impacted Tag</label>
+            <input type="text" name="students_impacted" class="form-control rounded-3" placeholder="e.g. 450+ Students">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Collaboration Summary</label>
+            <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Brief summary of how Project Jhep supports this school..."></textarea>
+          </div>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" name="is_active" id="newSchoolActive" checked>
+            <label class="form-check-label fw-bold text-body" for="newSchoolActive">Display publicly on landing page immediately</label>
+          </div>
+        </div>
+        <div class="modal-footer bg-body-tertiary">
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success rounded-pill fw-bold px-4">Register Partner School</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- MODAL: ADD NEW EDUCATOR REVIEW                                    -->
+<!-- ================================================================= -->
+<div class="modal fade" id="addReviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title fw-bold"><i class="bi bi-star-fill me-2"></i> Add Educator Review / Testimonial</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'admin_add_review' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Educator / Reviewer Name</label>
+            <input type="text" name="author_name" class="form-control rounded-3" placeholder="e.g. Sunita Patel" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Role Title / Designation</label>
+            <input type="text" name="author_role" class="form-control rounded-3" placeholder="e.g. Grade 8 Science Teacher" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">School or Region</label>
+            <input type="text" name="school_name" class="form-control rounded-3" placeholder="e.g. Gujarat Tribal Belt Hub">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Author Avatar Photo URL</label>
+            <input type="url" name="author_avatar" class="form-control rounded-3" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Star Rating (1 to 5)</label>
+            <select name="rating" class="form-select rounded-3">
+              <option value="5" selected>5 Stars (Excellent)</option>
+              <option value="4">4 Stars (Very Good)</option>
+              <option value="3">3 Stars (Good)</option>
+              <option value="2">2 Stars (Fair)</option>
+              <option value="1">1 Star (Needs Improvement)</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-muted">Testimonial Quote / Review Text</label>
+            <textarea name="content" class="form-control rounded-3" rows="4" placeholder="Share how Project Jhep impacted classroom learning..." required></textarea>
+          </div>
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" name="is_active" id="newReviewActive" checked>
+            <label class="form-check-label fw-bold text-body" for="newReviewActive">Display in landing carousel immediately</label>
+          </div>
+        </div>
+        <div class="modal-footer bg-body-tertiary">
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-warning text-dark rounded-pill fw-bold px-4">Publish Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Instant Live Filter for Educator Profiles
+  function filterTeachers() {
+    const query = document.getElementById('teacherSearchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#teachersTable .teacher-row');
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(query) ? '' : 'none';
+    });
+  }
+
+  // Instant Live Filter for Lesson Catalog
+  function filterLessons() {
+    const query = document.getElementById('lessonSearchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#lessonsTable .lesson-row');
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(query) ? '' : 'none';
+    });
+  }
+
+  // Instant Live Filter for Security Audit Logs
+  function filterLogs() {
+    const query = document.getElementById('logSearchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#logsTable .log-row');
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(query) ? '' : 'none';
+    });
+  }
+
+  // Password Management Helper Functions
+  function toggleTablePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) icon.className = 'bi bi-eye-slash';
+    } else {
+      input.type = 'password';
+      if (icon) icon.className = 'bi bi-eye';
+    }
+  }
+
+  function copyPassword(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert('Password copied to clipboard!');
+      }).catch(() => {
+        input.select();
+        document.execCommand('copy');
+        alert('Password copied!');
+      });
+    } else {
+      input.select();
+      document.execCommand('copy');
+      alert('Password copied!');
+    }
+  }
+
+  function generateRandomPass(inputId) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#$';
+    let result = '';
+    for (let i = 0; i < 10; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const input = document.getElementById(inputId);
+    if (input) input.value = result;
+  }
+
+  // Export Audit Logs to CSV
+  function exportLogsToCSV() {
+    const rows = document.querySelectorAll('#logsTable tr');
+    let csv = [];
+    rows.forEach(row => {
+      const cols = row.querySelectorAll('td, th');
+      let rowData = [];
+      cols.forEach(col => {
+        rowData.push('"' + col.innerText.replace(/"/g, '""').trim() + '"');
+      });
+      if (rowData.length > 0) csv.push(rowData.join(','));
+    });
+
+    const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+    const downloadLink = document.createElement('a');
+    downloadLink.download = 'project_jhep_security_audit_logs.csv';
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+</script>
+{% endblock %}

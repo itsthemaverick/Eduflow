@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | Project Jhep NGO Teacher Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-3">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-5">
+      
+      <!-- Login Card Container -->
+      <div class="card border rounded-4 shadow-lg overflow-hidden bg-body animate-scale-in">
+        
+        <!-- Card Header -->
+        <div class="card-header bg-brand-gradient text-white text-center p-4 border-0 position-relative">
+          <div class="bg-white bg-opacity-20 rounded-circle d-inline-flex p-3 mb-2 animate-float">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" class="text-white" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 3.5C22 3.5 17.5 5.5 14 4.5C10.5 3.5 8 1.5 4 3C1 4.2 0 8.5 0 8.5C0 8.5 3.5 7.5 5.5 8.5C7.5 9.5 8.5 12 7.5 15C6.5 18 3.5 20.5 3.5 20.5C3.5 20.5 7.5 20 11.5 17C15.5 14 17.5 9.5 22 3.5Z"/>
+            </svg>
+          </div>
+          <h3 class="fw-extrabold mb-1 font-heading">Project Jhep Portal</h3>
+          <p class="small text-white-50 mb-0">NGO Educator & Curriculum Management System</p>
+        </div>
+
+        <div class="card-body p-4 p-sm-5">
+
+          <!-- Role Selector Nav Tabs -->
+          <ul class="nav nav-pills nav-fill bg-body-tertiary p-1 rounded-pill mb-4 border" id="roleTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active rounded-pill fw-bold fs-7 py-2" id="teacher-tab" data-bs-toggle="pill" data-bs-target="#pills-teacher" type="button" role="tab" onclick="setRole('Teacher')">
+                <i class="bi bi-person-video3 me-1"></i> Educator Login
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link rounded-pill fw-bold fs-7 py-2" id="admin-tab" data-bs-toggle="pill" data-bs-target="#pills-admin" type="button" role="tab" onclick="setRole('Admin')">
+                <i class="bi bi-shield-check me-1"></i> Admin Portal
+              </button>
+            </li>
+          </ul>
+
+          <!-- Quick Demo Credentials Helper Pills -->
+          <div class="p-3 bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-3 mb-4 small">
+            <div class="fw-bold mb-1"><i class="bi bi-info-circle-fill me-1"></i> Quick Demo Access:</div>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <button type="button" class="badge bg-warning text-dark border-0 rounded-pill px-2 py-1 cursor-pointer" onclick="fillDemo('Maverick', 'Yashraj@7777', 'Admin')">
+                ⚡ Admin: Maverick
+              </button>
+              <button type="button" class="badge bg-secondary text-white border-0 rounded-pill px-2 py-1 cursor-pointer" onclick="fillDemo('anita.sharma', 'teacher123', 'Teacher')">
+                ⚡ Teacher: Anita
+              </button>
+            </div>
+          </div>
+
+          <!-- Authentication Form -->
+          <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="role" id="selectedRole" value="Teacher">
+
+            <!-- Username Field -->
+            <div class="mb-3">
+              <label for="username" class="form-label fw-bold small text-muted">
+                <i class="bi bi-person me-1"></i> Username
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-body-tertiary border-end-0 rounded-start-3"><i class="bi bi-person-fill text-muted"></i></span>
+                <input type="text" class="form-control form-control-lg border-start-0 rounded-end-3 fs-6" id="username" name="username" placeholder="e.g. Maverick or teacher username" required>
+              </div>
+            </div>
+
+            <!-- Password Field with Visibility Toggle -->
+            <div class="mb-4">
+              <label for="password" class="form-label fw-bold small text-muted">
+                <i class="bi bi-key me-1"></i> Password
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-body-tertiary border-end-0 rounded-start-3"><i class="bi bi-lock-fill text-muted"></i></span>
+                <input type="password" class="form-control form-control-lg border-start-0 border-end-0 fs-6" id="password" name="password" placeholder="••••••••" required>
+                <button class="btn btn-outline-secondary border-start-0 rounded-end-3" type="button" id="togglePasswordBtn" onclick="togglePasswordVisibility()">
+                  <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-warning bg-brand-gradient text-white btn-lg w-100 rounded-pill fw-bold shadow-sm mb-3 btn-glow">
+              <i class="bi bi-box-arrow-in-right me-2"></i> Authenticate & Enter Portal
+            </button>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function setRole(roleName) {
+    document.getElementById('selectedRole').value = roleName;
+  }
+
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleIcon.className = 'bi bi-eye-fill text-warning';
+    } else {
+      passwordInput.type = 'password';
+      toggleIcon.className = 'bi bi-eye-slash';
+    }
+  }
+
+  function fillDemo(username, password, role) {
+    document.getElementById('username').value = username;
+    document.getElementById('password').value = password;
+    setRole(role);
+    if (role === 'Admin') {
+      document.getElementById('admin-tab').click();
+    } else {
+      document.getElementById('teacher-tab').click();
+    }
+  }
+</script>
+{% endblock %}
+

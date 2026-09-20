@@ -1,0 +1,6 @@
+{
+  "name": "Project Jhep NGO Teacher Portal",
+  "description": "Production-ready content and lesson management platform created by Sproug Hub Foundation for NGO teachers and administrators under Project Jhep, supporting interactive presentations, videos, PDFs, partner school networks, educator reviews, and progress analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

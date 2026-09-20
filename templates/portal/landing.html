@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}Project Jhep NGO Portal | Empowering Rural Educators{% endblock %}
+
+{% block content %}
+<!-- ================================================================= -->
+<!-- 1. HERO BANNER SECTION                                            -->
+<!-- ================================================================= -->
+<section class="py-5 bg-body-secondary border-bottom position-relative overflow-hidden bg-mesh-pattern">
+  <!-- Decorative Ambient Glow Blobs -->
+  <div class="position-absolute top-0 start-50 translate-middle-x rounded-circle blur-3xl bg-warning opacity-10 pointer-events-none" style="width: 600px; height: 300px; filter: blur(90px);"></div>
+
+  <div class="container py-4 position-relative z-1">
+    <div class="row align-items-center gy-4">
+      
+      <!-- Hero Text Column -->
+      <div class="col-lg-7 animate-fade-in-up">
+        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-2 fw-bold mb-3 d-inline-flex align-items-center gap-2 shadow-sm">
+          <i class="bi bi-geo-alt-fill text-warning"></i> Serving 450+ Rural School Districts
+        </span>
+        <h1 class="display-5 fw-extrabold text-body lh-sm mb-3 font-heading">
+          Empowering Teachers with <span class="brand-gradient">Digital Mastery</span> & Curated Lessons
+        </h1>
+        <p class="lead text-muted mb-4">
+          Project Jhep provides rural educators with offline-capable teaching guides, interactive video modules, and progress analytics to transform community classrooms.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3">
+          {% if user %}
+            {% if user.role == 'Teacher' %}
+              <a href="{% url 'my_dashboard' %}" class="btn btn-warning bg-brand-gradient text-white btn-lg rounded-pill px-4 fw-bold shadow-sm btn-glow">
+                <i class="bi bi-journal-check me-2"></i> Open Teacher Dashboard
+              </a>
+            {% else %}
+              <a href="{% url 'admin_dashboard' %}" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm btn-glow">
+                <i class="bi bi-shield-lock me-2"></i> Admin Control Center
+              </a>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'login' %}" class="btn btn-warning bg-brand-gradient text-white btn-lg rounded-pill px-4 fw-bold shadow-sm btn-glow">
+              <i class="bi bi-box-arrow-in-right me-2"></i> Access Teacher Portal
+            </a>
+          {% endif %}
+          
+          <a href="#featured-lessons" class="btn btn-outline-secondary btn-lg rounded-pill px-4 fw-bold">
+            <i class="bi bi-compass me-2"></i> Explore Curriculum Catalog
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Visual Card Column -->
+      <div class="col-lg-5 animate-scale-in">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative card-hover-lift">
+          <div class="position-relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=800" alt="Rural Classroom Teaching" class="card-img-top object-fit-cover transition-all" style="height: 340px; transition: transform 0.5s ease;">
+          </div>
+          <div class="card-img-overlay bg-dark bg-opacity-50 d-flex flex-column justify-content-end p-4 text-white">
+            <span class="badge bg-success rounded-pill align-self-start mb-2 px-3 py-1 fw-bold shadow-sm">
+              <i class="bi bi-wifi-off me-1"></i> Active Offline Sync
+            </span>
+            <h5 class="fw-bold mb-1 font-heading">Interactive STEM & Language Modules</h5>
+            <p class="small text-light mb-0">Designed specifically for low-bandwidth rural infrastructure.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<!-- 2. SYSTEM IMPACT METRICS STATS CARDS                             -->
+<!-- ================================================================= -->
+<section class="py-4 bg-body border-bottom">
+  <div class="container">
+    <div class="row g-3">
+      
+      <div class="col-6 col-md-3">
+        <div class="p-3 bg-body-tertiary rounded-4 border d-flex align-items-center gap-3 card-hover-lift">
+          <div class="p-3 bg-warning-subtle text-warning rounded-4 fs-4 border border-warning-subtle">
+            <i class="bi bi-person-video3"></i>
+          </div>
+          <div>
+            <h3 class="fw-extrabold mb-0 text-body font-heading">{{ stats.total_teachers }}</h3>
+            <span class="text-muted small fw-semibold">Enrolled Teachers</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="p-3 bg-body-tertiary rounded-4 border d-flex align-items-center gap-3 card-hover-lift">
+          <div class="p-3 bg-primary-subtle text-primary rounded-4 fs-4 border border-primary-subtle">
+            <i class="bi bi-book"></i>
+          </div>
+          <div>
+            <h3 class="fw-extrabold mb-0 text-body font-heading">{{ stats.total_lessons }}</h3>
+            <span class="text-muted small fw-semibold">Lesson Modules</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="p-3 bg-body-tertiary rounded-4 border d-flex align-items-center gap-3 card-hover-lift">
+          <div class="p-3 bg-success-subtle text-success rounded-4 fs-4 border border-success-subtle">
+            <i class="bi bi-play-circle-fill"></i>
+          </div>
+          <div>
+            <h3 class="fw-extrabold mb-0 text-body font-heading">{{ stats.total_content_files }}</h3>
+            <span class="text-muted small fw-semibold">Digital Media Files</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="p-3 bg-body-tertiary rounded-4 border d-flex align-items-center gap-3 card-hover-lift">
+          <div class="p-3 bg-info-subtle text-info rounded-4 fs-4 border border-info-subtle">
+            <i class="bi bi-check2-circle"></i>
+          </div>
+          <div>
+            <h3 class="fw-extrabold mb-0 text-body font-heading">{{ stats.today_logins }}</h3>
+            <span class="text-muted small fw-semibold">Logins Today</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<!-- 3. FEATURED LESSON CURRICULUM CATALOG                             -->
+<!-- ================================================================= -->
+<section class="py-5" id="featured-lessons">
+  <div class="container py-2">
+    
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
+      <div>
+        <span class="text-warning fw-bold text-uppercase small tracking-wide">Curriculum Spotlight</span>
+        <h2 class="fw-extrabold text-body mb-0 font-heading">Featured Learning Modules</h2>
+      </div>
+
+      <!-- Interactive Category Filter Pills -->
+      <div class="d-flex flex-wrap gap-2" id="subjectFilterGroup">
+        <button class="btn btn-warning bg-brand-gradient text-white btn-sm rounded-pill px-3 fw-bold filter-btn active" onclick="filterCatalog('all', this)">All Subjects</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold filter-btn" onclick="filterCatalog('Mathematics', this)">Math</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold filter-btn" onclick="filterCatalog('Science', this)">Science</button>
+        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold filter-btn" onclick="filterCatalog('English', this)">English</button>
+      </div>
+    </div>
+
+    <div class="row g-4" id="lessonCatalogGrid">
+      {% for lesson in featured_lessons %}
+      <div class="col-md-6 col-lg-4 lesson-card-item" data-subject="{{ lesson.subject }}">
+        <div class="card h-100 border rounded-4 shadow-sm overflow-hidden card-hover-lift bg-body">
+          <div class="position-relative overflow-hidden group">
+            <img src="{{ lesson.thumbnail }}" alt="{{ lesson.title }}" class="card-img-top object-fit-cover transition-all" style="height: 190px; transition: transform 0.4s ease;">
+            <span class="position-absolute top-0 start-0 m-3 badge bg-dark bg-opacity-75 rounded-pill px-3 py-1 shadow-sm">
+              {{ lesson.grade }}
+            </span>
+            <span class="position-absolute bottom-0 end-0 m-3 badge bg-warning text-dark fw-bold rounded-pill shadow-sm">
+              <i class="bi bi-clock me-1"></i> {{ lesson.duration }}
+            </span>
+          </div>
+
+          <div class="card-body d-flex flex-column p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-1 font-semibold">
+                {{ lesson.subject }}
+              </span>
+              <span class="text-muted small"><i class="bi bi-file-earmark-play text-warning"></i> {{ lesson.contents.count }} Resources</span>
+            </div>
+
+            <h5 class="fw-bold text-body card-title mb-2 font-heading">{{ lesson.title }}</h5>
+            <p class="card-text text-muted small flex-grow-1 line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+              {{ lesson.summary }}
+            </p>
+
+            <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+              {% if user %}
+              <a href="{% url 'lesson_detail' lesson_id=lesson.id %}" class="btn btn-outline-warning btn-sm rounded-pill px-3 fw-bold">
+                <i class="bi bi-eye me-1"></i> Preview Lesson
+              </a>
+              {% else %}
+              <a href="{% url 'login' %}" class="btn btn-outline-warning btn-sm rounded-pill px-3 fw-bold" title="Login required to preview lessons">
+                <i class="bi bi-lock-fill me-1"></i> Login to Preview
+              </a>
+              {% endif %}
+              <span class="text-success small fw-bold"><i class="bi bi-check-circle me-1"></i> Ready for Delivery</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5">
+        <i class="bi bi-folder2-open display-3 text-muted"></i>
+        <p class="text-muted mt-2">No lesson modules currently available in the catalog.</p>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<!-- 3b. PARTNER SCHOOLS & INSTITUTIONAL NETWORK                       -->
+<!-- ================================================================= -->
+<section class="py-5 bg-body-tertiary border-top">
+  <div class="container py-3">
+    <div class="text-center mb-5 max-w-2xl mx-auto">
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold rounded-pill mb-2 px-3 py-1">Institutional Network</span>
+      <h2 class="fw-extrabold display-6 text-body mb-2 font-heading">Our Partner Schools</h2>
+      <p class="text-muted">Empowering rural schools, community hubs, and village learning centers with digital tools.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      {% for school in partner_schools %}
+      <div class="col-md-6 col-lg-3">
+        <div class="card h-100 rounded-4 border-0 shadow-sm card-hover-lift overflow-hidden text-center bg-body">
+          <div class="position-relative overflow-hidden" style="height: 150px; background-color: #f1f5f9;">
+            <img src="{{ school.logo_url }}" alt="{{ school.name }}" class="w-100 h-100 object-fit-cover">
+            <span class="position-absolute top-0 end-0 m-2 badge bg-dark bg-opacity-75 rounded-pill px-2 py-1 small">
+              <i class="bi bi-people-fill me-1 text-warning"></i> {{ school.students_impacted }}
+            </span>
+          </div>
+          <div class="card-body p-3 d-flex flex-column">
+            <h6 class="fw-bold card-title text-body mb-1 font-heading">{{ school.name }}</h6>
+            <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ school.location }}</p>
+            {% if school.description %}
+            <p class="card-text text-muted small flex-grow-1" style="font-size: 0.825rem;">{{ school.description }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-4">
+        <p class="text-muted">No partner schools currently listed.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<!-- 3c. EDUCATOR REVIEWS CAROUSEL                                     -->
+<!-- ================================================================= -->
+<section class="py-5 bg-body border-top">
+  <div class="container py-3">
+    <div class="text-center mb-5 max-w-2xl mx-auto">
+      <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold rounded-pill mb-2 px-3 py-1">Educator Testimonials</span>
+      <h2 class="fw-extrabold display-6 text-body mb-2 font-heading">What Teachers & Leaders Say</h2>
+      <p class="text-muted">Real experiences from educators using Project Jhep in community classrooms.</p>
+    </div>
+
+    {% if reviews %}
+    <div id="reviewsCarousel" class="carousel slide max-w-4xl mx-auto" data-bs-ride="carousel">
+      <!-- Carousel Indicators -->
+      <div class="carousel-indicators position-relative mt-4 mb-0">
+        {% for review in reviews %}
+        <button type="button" data-bs-target="#reviewsCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="bg-warning {% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Review {{ forloop.counter }}"></button>
+        {% endfor %}
+      </div>
+
+      <!-- Carousel Slides -->
+      <div class="carousel-inner rounded-4 shadow-md bg-body-tertiary border p-4 p-md-5">
+        {% for review in reviews %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}" data-bs-interval="6000">
+          <div class="text-center max-w-2xl mx-auto">
+            <div class="display-6 text-warning mb-3">
+              <i class="bi bi-quote"></i>
+            </div>
+            
+            <p class="fs-5 text-body fst-italic mb-4" style="line-height: 1.6;">
+              "{{ review.content }}"
+            </p>
+
+            <div class="mb-3">
+              {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                  <i class="bi bi-star-fill text-warning fs-6"></i>
+                {% else %}
+                  <i class="bi bi-star text-muted fs-6"></i>
+                {% endif %}
+              {% endfor %}
+            </div>
+
+            <div class="d-flex align-items-center justify-content-center gap-3">
+              <img src="{{ review.author_avatar }}" alt="{{ review.author_name }}" class="rounded-circle border border-2 border-warning shadow-sm" style="width: 56px; height: 56px; object-fit: cover;">
+              <div class="text-start">
+                <h6 class="fw-bold mb-0 text-body font-heading">{{ review.author_name }}</h6>
+                <p class="text-muted small mb-0">{{ review.author_role }} {% if review.school_name %}&bull; {{ review.school_name }}{% endif %}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#reviewsCarousel" data-bs-slide="prev" style="width: 5%;">
+        <span class="carousel-control-prev-icon bg-dark bg-opacity-50 rounded-circle p-3 shadow" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#reviewsCarousel" data-bs-slide="next" style="width: 5%;">
+        <span class="carousel-control-next-icon bg-dark bg-opacity-50 rounded-circle p-3 shadow" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+    {% else %}
+    <div class="text-center py-4">
+      <p class="text-muted">No reviews available yet.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<!-- 4. CALL TO ACTION & PORTAL ACCESS SECTION                         -->
+<!-- ================================================================= -->
+<section class="py-5 bg-warning-subtle border-top border-warning-subtle">
+  <div class="container text-center">
+    <div class="max-w-2xl mx-auto py-2">
+      <span class="badge bg-warning text-dark fw-bold rounded-pill mb-2 px-3 shadow-sm">Educator & Institutional Access</span>
+      <h3 class="fw-extrabold text-warning-emphasis mb-2 font-heading">Ready to Empower Your Rural Classroom?</h3>
+      <p class="text-muted mb-4">Access offline-ready lesson blueprints, interactive masterclasses, and digital progress tracking.</p>
+
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'login' %}" class="btn btn-warning bg-brand-gradient text-white btn-lg rounded-pill px-5 fw-bold shadow-sm btn-glow">
+          <i class="bi bi-box-arrow-in-right me-2"></i> Log In to Educator Portal
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Client-side Catalog Category Filtering Script
+  function filterCatalog(subject, btnEl) {
+    const cards = document.querySelectorAll('#lessonCatalogGrid .lesson-card-item');
+    const buttons = document.querySelectorAll('#subjectFilterGroup .filter-btn');
+
+    // Update active button styling
+    buttons.forEach(btn => {
+      btn.className = 'btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold filter-btn';
+    });
+    btnEl.className = 'btn btn-warning bg-brand-gradient text-white btn-sm rounded-pill px-3 fw-bold filter-btn active';
+
+    cards.forEach(card => {
+      const cardSubject = card.getAttribute('data-subject') || '';
+      if (subject === 'all' || cardSubject.toLowerCase().includes(subject.toLowerCase())) {
+        card.style.display = 'block';
+        card.classList.add('animate-scale-in');
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+</script>
+{% endblock %}
+
